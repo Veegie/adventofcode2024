@@ -41,25 +41,11 @@ max_word_length: int = 0
 min_word_length: int = 0
 possible_patterns: int = 0
 pattern_combinations: int = 0
-memo_possible: dict[str, bool] = dict()
-memo_combos: dict[str, int] = dict()
-
-def is_pattern_possible(pattern:str) -> bool:
-    if pattern in memo_possible:
-        return memo_possible[pattern]
-    if len(pattern) <= min_word_length and word_exists(trie_root, pattern):
-        memo_possible[pattern] = True
-        return True
-    for chunk in range(min(max_word_length, len(pattern)), min_word_length - 1, -1):
-        if word_exists(trie_root, pattern[:chunk]) and is_pattern_possible(pattern[chunk:]):
-            memo_possible[pattern] = True
-            return True
-    memo_possible[pattern] = False
-    return False
+memo: dict[str, int] = dict()
 
 def pattern_combos(pattern:str) -> int:
-    if pattern in memo_combos:
-        return memo_combos[pattern]
+    if pattern in memo:
+        return memo[pattern]
     if len(pattern) == 0:
         return 0
     combos = 0
@@ -69,7 +55,7 @@ def pattern_combos(pattern:str) -> int:
         for chunk in range(min(max_word_length, len(pattern)-1), min_word_length - 1, -1):
             if word_exists(trie_root, pattern[:chunk]):
                 combos += pattern_combos(pattern[chunk:])
-    memo_combos[pattern] = combos
+    memo[pattern] = combos
     return combos
 
 with open('input.txt') as file:
@@ -81,9 +67,11 @@ with open('input.txt') as file:
             insert_word(trie_root, word)
     for line in file.readlines():
         pattern = line.rstrip('\n')
-        if len(pattern) > 0 and is_pattern_possible(pattern):
-            possible_patterns += 1
-            pattern_combinations += pattern_combos(pattern)
+        if len(pattern) > 0:
+            combos = pattern_combos(pattern)
+            if combos > 0:
+                possible_patterns += 1
+                pattern_combinations += combos
 
 print('Part 1: ', possible_patterns)
 print('Part 2: ', pattern_combinations)
