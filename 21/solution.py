@@ -86,7 +86,6 @@ def len_human_from_directional(input:str, extra_iterations: int, shortest_len: i
                 transformed_command += bot_dirs[(d[prev_char_at_layer[i]], r)]
                 prev_char_at_layer[i] = r
             command = transformed_command
-            print(i)
         human_dirs_len += len(command)
         if human_dirs_len > shortest_len:
             return inf
